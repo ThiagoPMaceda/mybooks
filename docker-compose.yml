@@ -1,0 +1,26 @@
+version: '3.8'
+service:
+    db:
+        image: postgres
+        ports:
+            - '5432:5432'
+
+    server:
+        depends_on:
+            - db
+        build:
+            context: packages/api
+            dockerfile: Dockerfile
+        ports:
+            - '5000:5000'
+        command: ['./wait-for-it.sh', 'db: 5432']
+
+    web:
+        depends_on:
+            - server
+        build:
+            context: packages/web
+            dockerfile: Dockerfile
+        ports:
+            - '4000:4000'
+        command: ['./wait-for-it.sh', 'api: 5000']
